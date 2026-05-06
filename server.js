@@ -24,7 +24,7 @@ app.use('/api/fields', require('./routes/fields'))
 app.use(express.static(path.join(__dirname, 'client/dist')))
 
 // Catch-all — let React Router handle client-side navigation
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'))
 })
 
