@@ -95,7 +95,7 @@ router.get('/auth/google/callback',
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' })
 
         // 3. res.redirect to http://localhost:5173/dashboard
-        res.redirect(`http://localhost:5173/auth/callback?token=${token}`)
+        res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/callback?token=${token}`)
     }
 )
 
