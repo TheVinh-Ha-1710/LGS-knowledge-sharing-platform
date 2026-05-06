@@ -1,4 +1,3 @@
-require('dotenv').config()
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
@@ -86,7 +85,7 @@ router.get('/auth/google',
     
 // Google callback redirect route
 router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login', session: false }),
+    passport.authenticate('google', { failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`, session: false }),
     (req, res) => {
         // req.user is now populated by Passport
         const user = req.user
