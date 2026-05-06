@@ -1,0 +1,319 @@
+# API Reference
+
+Base URL: `http://localhost:3000/api`
+
+All endpoints return JSON. Protected endpoints require a valid session cookie (`token`) set during login.
+
+---
+
+## Authentication
+
+### POST /auth/register
+
+Create a new account.
+
+**Auth required:** No
+
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "strongpassword123"
+}
+```
+
+**Success response `201`:**
+```json
+{
+  "message": "User created!",
+  "user": {
+    "id": 1,
+    "email": "user@example.com"
+  }
+}
+```
+
+**Error responses:**
+- `400` — Email and password are required
+- `400` — User already exists
+- `400` — Password is too weak
+- `429` — Too many accounts created. Try again later.
+
+---
+
+### POST /auth/login
+
+Authenticate and receive a session cookie.
+
+**Auth required:** No
+
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "strongpassword123"
+}
+```
+
+**Success response `200`:**
+```json
+{ "message": "Logged in!" }
+```
+
+Sets `token` httpOnly cookie on the response.
+
+**Error responses:**
+- `400` — Email and password are required
+- `401` — Invalid credentials
+- `429` — Too many login attempts. Try again in 15 minutes.
+
+---
+
+### POST /auth/logout
+
+Invalidate the current session.
+
+**Auth required:** No (but uses the cookie if present)
+
+**Success response `200`:**
+```json
+{ "message": "Logged out!" }
+```
+
+Clears the `token` cookie and adds it to the blocklist.
+
+---
+
+### GET /auth/me
+
+Get the currently authenticated user.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{
+  "message": "Hello!",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "iat": 1714500000,
+    "exp": 1714503600
+  }
+}
+```
+
+**Error responses:**
+- `401` — Not logged in
+- `401` — Token has been invalidated. Please log in again.
+
+---
+
+### GET /auth/google
+
+Redirect to Google OAuth consent screen.
+
+**Auth required:** No
+
+Redirects the browser to Google. No JSON response.
+
+---
+
+### GET /auth/google/callback
+
+OAuth callback — handled by Passport. Redirects to `/auth/callback?token=...` on the frontend.
+
+---
+
+### POST /auth/login/callback
+
+Exchange an OAuth token for a session cookie. Called by the React `AuthCallback` page.
+
+**Auth required:** No
+
+**Request body:**
+```json
+{ "token": "jwt-token-string" }
+```
+
+**Success response `200`:**
+```json
+{ "message": "Session established" }
+```
+
+Sets `token` httpOnly cookie on the response.
+
+---
+
+## Fields
+
+### GET /fields
+
+Get all knowledge fields.
+
+**Auth required:** No
+
+**Success response `200`:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Technology",
+    "slug": "technology",
+    "icon": "💻",
+    "description": "Programming, networks, cybersecurity...",
+    "created_at": "2026-04-24T00:00:00.000Z"
+  }
+]
+```
+
+---
+
+## Materials
+
+### GET /materials
+
+Get all published materials with optional filters.
+
+**Auth required:** No
+
+**Query parameters:**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `field` | string | Filter by field slug (e.g. `technology`) |
+| `difficulty` | string | Filter by difficulty (`beginner`, `intermediate`, `advanced`) |
+
+**Success response `200`:**
+```json
+[
+  {
+    "id": 1,
+    "title": "Introduction to React",
+    "slug": "introduction-to-react",
+    "difficulty": "beginner",
+    "view_count": 42,
+    "created_at": "2026-05-01T00:00:00.000Z",
+    "author_email": "user@example.com",
+    "field_name": "Technology",
+    "field_slug": "technology",
+    "field_icon": "💻"
+  }
+]
+```
+
+Note: List response does not include `content` or `tags` — use the single material endpoint for full data.
+
+---
+
+### GET /materials/:slug
+
+Get a single material by slug. Increments `view_count`.
+
+**Auth required:** No
+
+**Success response `200`:**
+```json
+{
+  "id": 1,
+  "title": "Introduction to React",
+  "slug": "introduction-to-react",
+  "content": "<h1>Introduction</h1><p>React is...</p>",
+  "author_id": 1,
+  "field_id": 1,
+  "difficulty": "beginner",
+  "published": true,
+  "view_count": 43,
+  "created_at": "2026-05-01T00:00:00.000Z",
+  "updated_at": "2026-05-01T00:00:00.000Z",
+  "author_email": "user@example.com",
+  "field_name": "Technology",
+  "field_slug": "technology",
+  "field_icon": "💻",
+  "tags": [
+    { "name": "react", "slug": "react" },
+    { "name": "javascript", "slug": "javascript" }
+  ]
+}
+```
+
+**Error responses:**
+- `404` — Material not found
+
+---
+
+### GET /materials/id/:id
+
+Get a single material by ID. Used by the editor when loading an existing material for editing.
+
+**Auth required:** No
+
+**Success response `200`:** Same shape as `GET /materials/:slug` minus tags.
+
+---
+
+### POST /materials
+
+Create a new material.
+
+**Auth required:** Yes
+
+**Request body:**
+```json
+{
+  "title": "Introduction to React",
+  "content": "<h1>Introduction</h1><p>React is...</p>",
+  "field_id": 1,
+  "difficulty": "beginner",
+  "tags": ["react", "javascript"]
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `title` | Yes | Material title — slug is auto-generated |
+| `content` | No | HTML from TipTap editor |
+| `field_id` | Yes | ID of the field category |
+| `difficulty` | No | `beginner` (default), `intermediate`, or `advanced` |
+| `tags` | No | Array of tag name strings |
+
+**Success response `201`:** Full material object.
+
+**Error responses:**
+- `400` — Missing title or field ID
+- `401` — Not logged in
+
+---
+
+### PUT /materials/:id
+
+Update an existing material.
+
+**Auth required:** Yes + must be the author
+
+**Request body:** Same shape as POST (all fields optional).
+
+**Success response `200`:** Updated material object.
+
+**Error responses:**
+- `401` — Not logged in
+- `403` — Not authorised
+- `404` — Not found
+
+---
+
+### DELETE /materials/:id
+
+Delete a material. Also deletes related `material_tags` via CASCADE.
+
+**Auth required:** Yes + must be the author
+
+**Success response `200`:**
+```json
+{ "message": "Material deleted" }
+```
+
+**Error responses:**
+- `401` — Not logged in
+- `403` — Not authorised
+- `404` — Not found

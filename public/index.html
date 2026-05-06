@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auth Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0f;
+      --surface: #1a1a1b;
+      --border: #2e2e30;
+      --accent: #e8ff6b;
+      --accent-dim: rgba(232, 255, 107, 0.08);
+      --text: #f0f0ee;
+      --muted: #888885;
+      --danger: #ff6b6b;
+      --success: #6bffb8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+    }
+
+    .logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: var(--accent); }
+
+    .btn-group { display: flex; gap: 8px; margin-top: 20px; }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e0f;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover { border-color: var(--muted); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Logged-in view */
+    .logged-in { display: none; }
+
+    .user-badge {
+      background: var(--accent-dim);
+      border: 1px solid rgba(232, 255, 107, 0.2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      word-break: break-all;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      width: 100%;
+      padding: 10px;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      transition: transform 0.25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); color: var(--success); }
+    .toast.error { border-color: var(--danger); color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">⬡ auth.demo</div>
+
+  <!-- Auth view -->
+  <div class="auth-view" id="authView">
+    <h1 id="formTitle">Welcome back</h1>
+    <p class="subtitle" id="formSubtitle">Sign in to your account</p>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@example.com" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" />
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-primary" onclick="submit('/login')">Sign in</button>
+      <button class="btn-secondary" onclick="switchMode()">Register</button>
+    </div>
+  </div>
+
+  <!-- Logged-in view -->
+  <div class="logged-in" id="loggedInView">
+    <h1>You're in</h1>
+    <p class="subtitle">Authenticated successfully</p>
+    <div class="divider">session</div>
+    <div class="user-badge" id="userBadge"></div>
+    <button class="btn-danger" onclick="logout()">Sign out</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let mode = 'login'
+
+  function switchMode() {
+    mode = mode === 'login' ? 'register' : 'login'
+    const isLogin = mode === 'login'
+    document.getElementById('formTitle').textContent = isLogin ? 'Welcome back' : 'Create account'
+    document.getElementById('formSubtitle').textContent = isLogin ? 'Sign in to your account' : 'Register a new account'
+    document.querySelector('.btn-primary').textContent = isLogin ? 'Sign in' : 'Register'
+    document.querySelector('.btn-primary').onclick = () => submit(isLogin ? '/login' : '/register')
+    document.querySelector('.btn-secondary').textContent = isLogin ? 'Register' : 'Sign in'
+  }
+
+  async function submit(path) {
+    const email = document.getElementById('email').value
+    const password = document.getElementById('password').value
+    if (!email || !password) return showToast('Please fill in all fields', 'error')
+
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) return showToast(data.error, 'error')
+
+    if (path === '/register') {
+      showToast('Account created! Sign in now.', 'success')
+      mode = 'register'
+      switchMode()
+    } else {
+      await getMe()
+    }
+  }
+
+  async function getMe() {
+    const res = await fetch('/me', { credentials: 'include' })
+    const data = await res.json()
+    if (res.ok) {
+      document.getElementById('authView').style.display = 'none'
+      document.getElementById('loggedInView').style.display = 'block'
+      document.getElementById('userBadge').textContent =
+        `id: ${data.user.id}\nemail: ${data.user.email}\nexpires: ${new Date(data.user.exp * 1000).toLocaleTimeString()}`
+    }
+  }
+
+  async function logout() {
+    await fetch('/logout', { method: 'POST', credentials: 'include' })
+    document.getElementById('authView').style.display = 'block'
+    document.getElementById('loggedInView').style.display = 'none'
+    document.getElementById('email').value = ''
+    document.getElementById('password').value = ''
+    showToast('Signed out', 'success')
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = `toast ${type} show`
+    setTimeout(() => t.classList.remove('show'), 3000)
+  }
+
+  // Check if already logged in on page load
+  getMe()
+</script>
+</body>
+</html>
