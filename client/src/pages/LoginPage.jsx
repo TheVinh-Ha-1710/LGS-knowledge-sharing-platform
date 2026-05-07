@@ -69,7 +69,7 @@ function LoginPage() {
         <div className="divider">or</div>
         
         <a
-          href="http://localhost:3000/api/auth/google"
+          href="/api/auth/google"
           className="btn btn-ghost"
           style={{ display: 'block', textAlign: 'center', textDecoration: 'none', marginTop: 8 }}
         >

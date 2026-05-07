@@ -6,6 +6,7 @@ const passport = require('./passport')
 const path = require('path')
 
 const app = express()
+app.set('trust proxy', 1)     // Trust proxy on Railway deployment
 
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
