@@ -48,13 +48,34 @@ router.get('/', async (req, res) => {
   }
 })
 
+// Get material by ID
+router.get('/id/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM materials WHERE id = $1', [req.params.id]
+    )
+    if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
+    res.json(result.rows[0])
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Separate view count endpoint
+router.post('/:slug/view', async (req, res) => {
+  try {
+    await pool.query(
+      'UPDATE materials SET view_count = view_count + 1 WHERE slug = $1',
+      [req.params.slug]
+    )
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 // Get single material and increment view count
 async function getMaterial(slug) {
-  await pool.query(
-    'UPDATE materials SET view_count = view_count + 1 WHERE slug = $1',
-    [slug]
-  )
-
   return pool.query(`
     SELECT m.*,
       u.email as author_email,
@@ -92,19 +113,6 @@ router.get('/:slug', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message })
     }
-})
-
-// Get material by ID
-router.get('/id/:id', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM materials WHERE id = $1', [req.params.id]
-    )
-    if (!result.rows[0]) return res.status(404).json({ error: 'Not found' })
-    res.json(result.rows[0])
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
 })
 
 // POST new material route

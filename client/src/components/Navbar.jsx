@@ -24,7 +24,7 @@ function Navbar() {
         let's.get.smarter
       </Link>
 
-      <Link to="/explore">Explore</Link>
+      {user && <Link to="/explore">Explore</Link>}
 
       {!user && <Link to="/login">Sign in</Link>}
       {!user && <Link to="/register">Register</Link>}

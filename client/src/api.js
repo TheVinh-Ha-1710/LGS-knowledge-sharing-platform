@@ -27,6 +27,7 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(data)
   }),
+  trackView: (slug) => request(`/materials/${slug}/view`, { method: 'POST' }),
   updateMaterial: (id, data) => request(`/materials/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data)

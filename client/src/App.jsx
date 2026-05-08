@@ -23,8 +23,12 @@ function App() {
         } />
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/materials/:slug" element={<MaterialPage />} />
+        <Route path="/explore" element={
+          <ProtectedRoute><ExplorePage /></ProtectedRoute>
+        } />
+        <Route path="/materials/:slug" element={
+          <ProtectedRoute><MaterialPage /></ProtectedRoute>
+        } />
         <Route path="/editor" element={
           <ProtectedRoute><EditorPage /></ProtectedRoute>
         } />

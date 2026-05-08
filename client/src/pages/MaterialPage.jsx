@@ -4,6 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { DifficultyBadge, getFieldAccent } from '../utils.jsx'
 import DOMPurify from 'dompurify'
+import { useEffect } from 'react'
 
 function MaterialPage() {
   const { slug } = useParams()
@@ -11,9 +12,14 @@ function MaterialPage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
+  useEffect(() => {
+    api.trackView(slug)
+  }, [slug])   // only fires when slug changes — i.e. when you first land on the page
+
   const { data: material, isLoading, error } = useQuery({
     queryKey: ['material', slug],
-    queryFn: () => api.getMaterial(slug)
+    queryFn: () => api.getMaterial(slug),
+    refetchOnWindowFocus: false     // Not fetch on tab switch
   })
 
   const deleteMutation = useMutation({
