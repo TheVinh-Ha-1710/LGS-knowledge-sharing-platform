@@ -83,6 +83,9 @@ Not prioritised yet — things worth considering.
 - Export material as PDF
 - Embed code snippets with live preview (for IT materials)
 - Public/private toggle per material
+- Draft saving improvement — scope drafts to user ID to prevent cross-user 
+  draft leakage on shared devices. Add timestamp and auto-expiry (7 days). 
+  Consider server-side draft storage so drafts sync across devices.
 
 ---
 

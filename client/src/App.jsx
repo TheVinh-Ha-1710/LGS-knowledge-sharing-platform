@@ -7,33 +7,54 @@ import Navbar from './components/Navbar'
 import AuthCallback from './pages/AuthCallback'
 import ExplorePage from './pages/ExplorePage'
 import MaterialPage from './pages/MaterialPage'
-import EditorPage from './pages/EditorPage'
+import MetadataStep from './pages/editor/MetadataStep'
+import ContentStep from './pages/editor/ContentStep'
+import ReviewStep from './pages/editor/ReviewStep'
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
+        {/* Auth routes — public */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+
+        {/* Root redirect */}
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+
+        {/* App routes — protected */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute><DashboardPage /></ProtectedRoute>
+        } />
         <Route path="/explore" element={
           <ProtectedRoute><ExplorePage /></ProtectedRoute>
         } />
         <Route path="/materials/:slug" element={
           <ProtectedRoute><MaterialPage /></ProtectedRoute>
         } />
+
+        {/* Create flow — 3 steps */}
         <Route path="/editor" element={
-          <ProtectedRoute><EditorPage /></ProtectedRoute>
+          <ProtectedRoute><MetadataStep /></ProtectedRoute>
         } />
+        <Route path="/editor/content" element={
+          <ProtectedRoute><ContentStep /></ProtectedRoute>
+        } />
+        <Route path="/editor/review" element={
+          <ProtectedRoute><ReviewStep /></ProtectedRoute>
+        } />
+
+        {/* Edit flow — same 3 steps, pre-filled */}
         <Route path="/editor/:id" element={
-          <ProtectedRoute><EditorPage /></ProtectedRoute>
+          <ProtectedRoute><MetadataStep /></ProtectedRoute>
+        } />
+        <Route path="/editor/:id/content" element={
+          <ProtectedRoute><ContentStep /></ProtectedRoute>
+        } />
+        <Route path="/editor/:id/review" element={
+          <ProtectedRoute><ReviewStep /></ProtectedRoute>
         } />
       </Routes>
     </BrowserRouter>

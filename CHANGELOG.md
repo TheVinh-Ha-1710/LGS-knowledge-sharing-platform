@@ -61,3 +61,17 @@ First stable release. MVP delivered and ready for use by the core group.
 - Environment variable management via dotenv
 - CORS configured for cross-origin React frontend
 - Vite proxy for clean API calls in development
+
+---
+
+## [1.0.1] — 2026-05-08
+
+### Fixed
+- View count now increments once per visit, not on every tab switch
+- Knowledge base restricted to authenticated users only
+- Google OAuth button now uses relative URL — works in production
+
+### Changed
+- Material creation and editing now uses a 3-step flow:
+  Metadata → Content → Review before publishing
+- Draft auto-saves to localStorage so work is never lost mid-flow
