@@ -13,8 +13,10 @@ function MaterialPage() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    api.trackView(slug)
-  }, [slug])   // only fires when slug changes — i.e. when you first land on the page
+    api.trackView(slug).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['material', slug] })
+    })
+  }, [slug])
 
   const { data: material, isLoading, error } = useQuery({
     queryKey: ['material', slug],
