@@ -4,6 +4,11 @@ A private knowledge sharing platform for a group of friends from different acade
 
 ---
 
+## Current version
+v1.0.1 — [Release notes](https://github.com/TheVinh-Ha-1710/LGS-knowledge-sharing-platform/releases/tag/v1.0.1)
+
+---
+
 ## Tech stack
 
 | Layer | Technology |
