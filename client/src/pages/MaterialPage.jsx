@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { DifficultyBadge, getFieldAccent } from '../utils.jsx'
 import DOMPurify from 'dompurify'
 import { useEffect } from 'react'
+import Reactions from '../components/Reactions'
 
 function MaterialPage() {
   const { slug } = useParams()
@@ -130,6 +131,9 @@ function MaterialPage() {
 
       {/* Divider */}
       <div style={{ height: 1, background: 'var(--border)', margin: '40px 0 24px' }} />
+
+      {/* Reactions */}
+      <Reactions materialId={material?.id} />
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

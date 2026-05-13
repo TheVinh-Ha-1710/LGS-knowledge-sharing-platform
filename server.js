@@ -20,6 +20,7 @@ app.use(passport.initialize())
 app.use('/api', require('./routes/auth'))
 app.use('/api/materials', require('./routes/materials'))
 app.use('/api/fields', require('./routes/fields'))
+app.use('/api/reactions', require('./routes/reactions'))
 
 // Serve React build
 app.use(express.static(path.join(__dirname, 'client/dist')))

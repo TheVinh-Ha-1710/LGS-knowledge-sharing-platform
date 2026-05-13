@@ -34,5 +34,10 @@ export const api = {
   }),
   deleteMaterial: (id) => request(`/materials/${id}`, {
     method: 'DELETE'
+  }),
+  getReactions: (materialId) => request(`/reactions/${materialId}`),
+  toggleReaction: (materialId, type) => request(`/reactions/${materialId}`, {
+    method: 'POST',
+    body: JSON.stringify({ type })
   })
 }
