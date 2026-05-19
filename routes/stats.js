@@ -33,7 +33,7 @@ router.get('/trending', async (req, res) => {
       LEFT JOIN users u ON m.author_id = u.id
       LEFT JOIN fields f ON m.field_id = f.id
       WHERE m.published = true
-      AND m.created_at >= NOW() - INTERVAL '7 days'
+    //   AND m.created_at >= NOW() - INTERVAL '7 days'  (just opt out this for now since not much users yet)
       ORDER BY m.view_count DESC
       LIMIT 5
     `)
