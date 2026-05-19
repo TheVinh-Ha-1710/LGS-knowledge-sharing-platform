@@ -39,5 +39,9 @@ export const api = {
   toggleReaction: (materialId, type) => request(`/reactions/${materialId}`, {
     method: 'POST',
     body: JSON.stringify({ type })
-  })
+  }),
+
+    // reads
+  getReadStatus: (materialId) => request(`/reads/${materialId}`),
+  toggleRead: (materialId) => request(`/reads/${materialId}`, { method: 'POST' })
 }

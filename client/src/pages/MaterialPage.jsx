@@ -6,6 +6,7 @@ import { DifficultyBadge, getFieldAccent } from '../utils.jsx'
 import DOMPurify from 'dompurify'
 import { useEffect } from 'react'
 import Reactions from '../components/Reactions'
+import ReadStatus from '../components/ReadStatus'
 
 function MaterialPage() {
   const { slug } = useParams()
@@ -134,6 +135,13 @@ function MaterialPage() {
 
       {/* Reactions */}
       <Reactions materialId={material?.id} />
+
+      {/* Read status — only show if not the author */}
+      {!isAuthor && (
+        <div style={{ marginTop: 16 }}>
+          <ReadStatus materialId={material?.id} />
+        </div>
+      )}
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
