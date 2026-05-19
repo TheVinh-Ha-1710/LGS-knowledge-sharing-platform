@@ -22,6 +22,7 @@ app.use('/api/materials', require('./routes/materials'))
 app.use('/api/fields', require('./routes/fields'))
 app.use('/api/reactions', require('./routes/reactions'))
 app.use('/api/reads', require('./routes/reads'))
+app.use('/api/stats', require('./routes/stats'))
 
 // Serve React build
 app.use(express.static(path.join(__dirname, 'client/dist')))

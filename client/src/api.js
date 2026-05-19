@@ -43,5 +43,9 @@ export const api = {
 
     // reads
   getReadStatus: (materialId) => request(`/reads/${materialId}`),
-  toggleRead: (materialId) => request(`/reads/${materialId}`, { method: 'POST' })
+  toggleRead: (materialId) => request(`/reads/${materialId}`, { method: 'POST' }),
+
+  // stats
+  getLeaderboard: () => request('/stats/leaderboard'),
+  getTrending: () => request('/stats/trending')
 }
