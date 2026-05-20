@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-  const { user, logout } = useAuth()
+  const { user, logout, streak } = useAuth()  // ← add streak
   const navigate = useNavigate()
 
   async function handleLogout() {
@@ -30,6 +30,18 @@ function Navbar() {
       {!user && <Link to="/register">Register</Link>}
 
       {user && <Link to="/editor" className="navbar-new">+ New</Link>}
+
+      {/* Streak indicator — only show if user has an active streak */}
+      {user && streak > 0 && (
+        <span style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          color: 'var(--accent)'
+        }}>
+          🔥 {streak}
+        </span>
+      )}
+
       {user && (
         <Link to="/profile" style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>
           {user.email?.split('@')[0]}

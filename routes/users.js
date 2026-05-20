@@ -60,12 +60,50 @@ router.get('/me', requireAuth, async (req, res) => {
       WHERE r.user_id = $1
       ORDER BY r.read_at DESC
     `, [req.user.id])
+    
+    // Streak Data
+    const streakData = await pool.query(`
+      WITH completion_days AS (
+        -- Get distinct days where user completed at least one material
+        SELECT DISTINCT DATE(read_at) as day
+        FROM reads
+        WHERE user_id = $1 AND completed = true
+      ),
+      grouped AS (
+        -- Gap-and-islands: subtract row number from date to group consecutive days
+        -- Consecutive dates produce the same group value
+        SELECT day,
+          day - (ROW_NUMBER() OVER (ORDER BY day) || ' days')::INTERVAL as grp
+        FROM completion_days
+      ),
+      streaks AS (
+        -- Count days in each consecutive group
+        SELECT grp, COUNT(*) as streak_length,
+          MAX(day) as last_day
+        FROM grouped
+        GROUP BY grp
+      )
+      SELECT
+        -- Longest streak ever
+        MAX(streak_length) as longest_streak,
+        -- Current streak — only count if the most recent group includes today or yesterday
+        -- (yesterday allows for the day not being over yet)
+        COALESCE((
+          SELECT streak_length FROM streaks
+          WHERE last_day >= CURRENT_DATE - INTERVAL '1 day'
+          ORDER BY last_day DESC
+          LIMIT 1
+        ), 0) as current_streak
+      FROM streaks
+    `, [req.user.id])
 
     res.json({
       user: user.rows[0],
       stats: {
         ...stats.rows[0],
-        fields_explored: exploredFields.rows[0].fields_explored
+        fields_explored: exploredFields.rows[0].fields_explored,
+        current_streak: streakData.rows[0]?.current_streak || 0,
+        longest_streak: streakData.rows[0]?.longest_streak || 0
       },
       materials: materials.rows,
       reads: reads.rows

@@ -13,25 +13,19 @@ function ProfilePage() {
   const isOwnProfile = !username
 
   // ALL hooks must be declared before any conditional returns
-  // This follows the Rules of Hooks — no hooks after early returns
-
-  // Fetch own full profile — enabled when viewing own profile OR when
-  // the username matches the logged-in user (so data is ready before redirect)
   const { data: ownProfile, isLoading: ownLoading } = useQuery({
     queryKey: ['profile', 'me'],
     queryFn: api.getMyProfile,
     enabled: isOwnProfile || username === loggedInUsername
   })
 
-  // Fetch public profile — only when viewing someone else's profile
   const { data: publicProfile, isLoading: publicLoading, error: publicError } = useQuery({
     queryKey: ['profile', username],
     queryFn: () => api.getUserProfile(username),
     enabled: !isOwnProfile && username !== loggedInUsername
   })
 
-  // Safe to do conditional returns now — all hooks already called above
-  // If the username in the URL matches the logged-in user, redirect to full profile
+  // Redirect own username to full profile — after all hooks
   if (username && username === loggedInUsername) {
     return <Navigate to="/profile" replace />
   }
@@ -51,10 +45,12 @@ function ProfilePage() {
     </div>
   )
 
-  // Display name — own profile uses email prefix, public uses username field
   const displayName = isOwnProfile
     ? profile?.user?.email?.split('@')[0]
     : profile?.user?.username
+
+  const currentStreak = profile?.stats?.current_streak || 0
+  const longestStreak = profile?.stats?.longest_streak || 0
 
   return (
     <div className="app-page" style={{ maxWidth: 740 }}>
@@ -78,7 +74,6 @@ function ProfilePage() {
           {displayName}
         </h1>
 
-        {/* Show email only on own profile */}
         {isOwnProfile && (
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 4 }}>
             {profile?.user?.email}
@@ -88,6 +83,25 @@ function ProfilePage() {
         <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)' }}>
           member since {new Date(profile?.user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
         </p>
+
+        {/* Streak banner — own profile only, only if streak > 0 */}
+        {isOwnProfile && currentStreak > 0 && (
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'var(--accent-dim)',
+            border: '1px solid var(--accent)',
+            borderRadius: 6,
+            padding: '6px 12px',
+            marginTop: 12,
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12,
+            color: 'var(--accent)'
+          }}>
+            🔥 {currentStreak} day streak
+          </div>
+        )}
       </div>
 
       {/* Stats row */}
@@ -97,7 +111,6 @@ function ProfilePage() {
           <div className="stat-value">{profile?.stats?.materials_authored || 0}</div>
         </div>
 
-        {/* Read and completed — own profile only */}
         {isOwnProfile && (
           <>
             <div className="stat-card">
@@ -116,12 +129,21 @@ function ProfilePage() {
           <div className="stat-value">{profile?.stats?.reactions_received || 0}</div>
         </div>
 
-        {/* Fields explored — own profile only */}
         {isOwnProfile && (
-          <div className="stat-card">
-            <div className="stat-label">Fields explored</div>
-            <div className="stat-value">{profile?.stats?.fields_explored || 0}</div>
-          </div>
+          <>
+            <div className="stat-card">
+              <div className="stat-label">Fields explored</div>
+              <div className="stat-value">{profile?.stats?.fields_explored || 0}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">🔥 Current streak</div>
+              <div className="stat-value">{currentStreak} days</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Best streak</div>
+              <div className="stat-value">{longestStreak} days</div>
+            </div>
+          </>
         )}
       </div>
 
@@ -178,7 +200,6 @@ function ProfilePage() {
                     gap: 12,
                     transition: 'border-color 0.15s'
                   }}>
-                    {/* Completion status */}
                     <span style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: 12,
@@ -188,12 +209,10 @@ function ProfilePage() {
                       {read.completed ? '✓' : '📖'}
                     </span>
 
-                    {/* Field icon */}
                     <span style={{ fontSize: 16, flexShrink: 0 }}>
                       {read.field_icon}
                     </span>
 
-                    {/* Title and field */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {read.title}
@@ -203,10 +222,8 @@ function ProfilePage() {
                       </div>
                     </div>
 
-                    {/* Difficulty badge */}
                     <DifficultyBadge difficulty={read.difficulty} />
 
-                    {/* Status label */}
                     <span style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: 10,
