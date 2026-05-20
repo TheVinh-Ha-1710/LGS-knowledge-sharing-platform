@@ -10,6 +10,7 @@ import MaterialPage from './pages/MaterialPage'
 import MetadataStep from './pages/editor/MetadataStep'
 import ContentStep from './pages/editor/ContentStep'
 import ReviewStep from './pages/editor/ReviewStep'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
   return (
@@ -55,6 +56,16 @@ function App() {
         } />
         <Route path="/editor/:id/review" element={
           <ProtectedRoute><ReviewStep /></ProtectedRoute>
+        } />
+
+        {/* Own profile */}
+        <Route path="/profile" element={
+          <ProtectedRoute><ProfilePage /></ProtectedRoute>
+        } />
+
+        {/* Public profile */}
+        <Route path="/profile/:username" element={
+          <ProtectedRoute><ProfilePage /></ProtectedRoute>
         } />
       </Routes>
     </BrowserRouter>

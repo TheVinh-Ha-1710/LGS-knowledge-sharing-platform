@@ -31,9 +31,9 @@ function Navbar() {
 
       {user && <Link to="/editor" className="navbar-new">+ New</Link>}
       {user && (
-        <span className="navbar-user">
+        <Link to="/profile" style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>
           {user.email?.split('@')[0]}
-        </span>
+        </Link>
       )}
       {user && (
         <button className="navbar-btn" onClick={handleLogout}>

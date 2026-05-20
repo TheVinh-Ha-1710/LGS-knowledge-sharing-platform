@@ -47,5 +47,9 @@ export const api = {
 
   // stats
   getLeaderboard: () => request('/stats/leaderboard'),
-  getTrending: () => request('/stats/trending')
+  getTrending: () => request('/stats/trending'),
+
+  //users
+  getMyProfile: () => request('/users/me'),
+  getUserProfile: (username) => request(`/users/${username}`)
 }

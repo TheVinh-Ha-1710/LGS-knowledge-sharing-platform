@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { DifficultyBadge, getFieldAccent } from '../utils.jsx'
@@ -92,7 +92,12 @@ function MaterialPage() {
 
       {/* Author + date */}
       <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 16 }}>
-        by <span style={{ color: 'var(--text-2)' }}>{material?.author_email?.split('@')[0]}</span>
+        by <Link
+          to={`/profile/${material?.author_email?.split('@')[0]}`}
+          style={{ color: 'var(--text-2)', textDecoration: 'none', fontFamily: 'var(--font-mono)' }}
+        >
+          {material?.author_email?.split('@')[0]}
+        </Link>
         {' · '}
         {new Date(material?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
       </p>

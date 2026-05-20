@@ -1,5 +1,6 @@
 // client/src/utils.js
 // Shared utility functions used across components
+import { Link } from 'react-router-dom'
 
 export function getFieldAccent(fieldSlug) {
   const map = {
@@ -37,9 +38,13 @@ export function MaterialCard({ material, onClick }) {
       <div className="card-title">{material.title}</div>
       <div className="card-meta">
         <DifficultyBadge difficulty={material.difficulty} />
-        <span className="card-author">
+        <Link
+          to={`/profile/${material.author_email?.split('@')[0]}`}
+          onClick={e => e.stopPropagation()}  // prevent card click navigating to material
+          style={{ color: 'var(--text-3)', textDecoration: 'none' }}
+        >
           {material.author_email?.split('@')[0]}
-        </span>
+        </Link>
       </div>
     </div>
   )
