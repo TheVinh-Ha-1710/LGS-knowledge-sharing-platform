@@ -7,6 +7,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] — 2026-05-22
+
+### Added
+- Reactions — helpful, mindblown, needs work with toggle behaviour
+- Read tracking — mark as read and mark as complete per user per material
+- Learning streaks — current and longest streak calculated from completion history
+- Profile pages — own full profile and public limited view per user
+- Personal notes — private per-user notes on materials with profile preview
+- Leaderboard — top 10 contributors by material count on dashboard
+- Trending materials — top 5 by view count on dashboard
+- Clickable author names linking to user profiles
+
+### Changed
+- Dashboard updated with leaderboard, trending and streak stat card
+- Navbar shows streak indicator when user has an active streak
+
+---
+
+## [1.0.1] — 2026-05-08
+
+### Fixed
+- View count now increments once per visit, not on every tab switch
+- Knowledge base restricted to authenticated users only
+- Google OAuth button now uses relative URL — works in production
+- trust proxy added for Railway reverse proxy
+
+### Changed
+- Material creation and editing now uses a 3-step flow:
+  Metadata → Content → Review before publishing
+- Draft auto-saves to localStorage so work is never lost mid-flow
+
+---
+
 ## [1.0.0] — 2026-05-06
 
 First stable release. MVP delivered and ready for use by the core group.

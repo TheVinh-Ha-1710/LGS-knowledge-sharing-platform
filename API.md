@@ -317,3 +317,246 @@ Delete a material. Also deletes related `material_tags` via CASCADE.
 - `401` — Not logged in
 - `403` — Not authorised
 - `404` — Not found
+
+---
+
+## Reactions
+
+### GET /reactions/:materialId
+
+Get reaction counts and current user's reaction for a material.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{
+  "counts": [
+    { "type": "helpful", "count": "5" },
+    { "type": "mindblown", "count": "2" }
+  ],
+  "userReaction": "helpful"
+}
+```
+
+`userReaction` is `null` if the user hasn't reacted.
+
+---
+
+### POST /reactions/:materialId
+
+Toggle a reaction. Inserts, updates, or deletes depending on current state.
+
+**Auth required:** Yes
+
+**Request body:**
+```json
+{ "type": "helpful" }
+```
+
+Valid types: `helpful`, `mindblown`, `needs_work`
+
+**Success response `200`:**
+```json
+{ "action": "added", "type": "helpful" }
+```
+
+`action` is one of `added`, `removed`, `updated`.
+
+---
+
+## Reads
+
+### GET /reads/:materialId
+
+Get current user's read status for a material.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{ "read": true, "completed": false }
+```
+
+---
+
+### POST /reads/:materialId
+
+Toggle read or completion state. Three state transitions:
+- No record → mark as read (`completed: false`)
+- Read but not completed → mark as complete (`completed: true`)
+- Completed → toggle back to read (`completed: false`)
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{ "action": "completed", "read": true, "completed": true }
+```
+
+`action` is one of `added`, `completed`, `uncompleted`.
+
+---
+
+## Stats
+
+### GET /stats/leaderboard
+
+Get top 10 contributors ranked by published material count.
+
+**Auth required:** No
+
+**Success response `200`:**
+```json
+[
+  { "email": "user@example.com", "material_count": "12" }
+]
+```
+
+---
+
+### GET /stats/trending
+
+Get top 5 most viewed published materials.
+
+**Auth required:** No
+
+**Success response `200`:**
+```json
+[
+  {
+    "id": 1,
+    "title": "Introduction to React",
+    "slug": "introduction-to-react",
+    "view_count": 42,
+    "author_email": "user@example.com",
+    "field_name": "Technology",
+    "field_slug": "technology",
+    "field_icon": "💻"
+  }
+]
+```
+
+---
+
+## Users
+
+### GET /users/me
+
+Get full profile for the logged-in user including stats, materials, reads and notes.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "created_at": "2026-05-01T00:00:00.000Z"
+  },
+  "stats": {
+    "materials_authored": "5",
+    "materials_read": "12",
+    "materials_completed": "8",
+    "reactions_received": "23",
+    "fields_explored": "3",
+    "current_streak": "3",
+    "longest_streak": "7"
+  },
+  "materials": [...],
+  "reads": [...],
+  "notes": [...]
+}
+```
+
+---
+
+### GET /users/:username
+
+Get public profile for any user. Username is the email prefix (e.g. `vinh` from `vinh@example.com`).
+
+**Auth required:** No
+
+**Success response `200`:**
+```json
+{
+  "user": {
+    "username": "vinh",
+    "created_at": "2026-05-01T00:00:00.000Z"
+  },
+  "stats": {
+    "materials_authored": "5",
+    "reactions_received": "23"
+  },
+  "materials": [...]
+}
+```
+
+**Error responses:**
+- `404` — User not found
+
+---
+
+## Notes
+
+### GET /notes/:materialId
+
+Get current user's private note for a material.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{
+  "note": {
+    "id": 1,
+    "content": "This was really helpful for understanding...",
+    "created_at": "2026-05-06T10:00:00.000Z",
+    "updated_at": "2026-05-06T10:00:00.000Z"
+  }
+}
+```
+
+Returns `{ "note": null }` if no note exists yet.
+
+---
+
+### POST /notes/:materialId
+
+Create or update a note. Uses upsert — safe to call repeatedly.
+
+**Auth required:** Yes
+
+**Request body:**
+```json
+{ "content": "My private notes about this material..." }
+```
+
+**Success response `200`:**
+```json
+{
+  "note": {
+    "id": 1,
+    "content": "My private notes about this material...",
+    "created_at": "2026-05-06T10:00:00.000Z",
+    "updated_at": "2026-05-06T11:30:00.000Z"
+  }
+}
+```
+
+**Error responses:**
+- `400` — Note content cannot be empty
+
+---
+
+### DELETE /notes/:materialId
+
+Delete a note permanently.
+
+**Auth required:** Yes
+
+**Success response `200`:**
+```json
+{ "message": "Note deleted" }
+```

@@ -5,7 +5,7 @@ A private knowledge sharing platform for a group of friends from different acade
 ---
 
 ## Current version
-v1.0.1 — [Release notes](https://github.com/TheVinh-Ha-1710/LGS-knowledge-sharing-platform/releases/tag/v1.0.1)
+v1.1.0 — [Release notes](https://github.com/TheVinh-Ha-1710/LGS-knowledge-sharing-platform/releases/tag/v1.1.0)
 
 ---
 
@@ -135,27 +135,42 @@ lets-get-smarter/
 ├── routes/
 │   ├── auth.js            # Auth endpoints
 │   ├── materials.js       # Materials CRUD endpoints
-│   └── fields.js          # Fields endpoint
+│   ├── fields.js          # Fields endpoint
+│   ├── reactions.js       # Reactions endpoints
+│   ├── reads.js           # Read tracking endpoints
+│   ├── stats.js           # Leaderboard and trending endpoints
+│   ├── users.js           # User profile endpoints
+│   └── notes.js           # Personal notes endpoints
 ├── migrations/            # Database migration files
+├── seed.js                # Fields seed script
 ├── .env                   # Environment variables (not committed)
 └── client/                # React frontend (Vite)
     └── src/
         ├── api.js         # Centralised fetch functions
         ├── utils.jsx      # Shared components and helpers
         ├── context/
-        │   └── AuthContext.jsx
+        │   ├── AuthContext.jsx
+        │   └── EditorContext.jsx
         ├── components/
         │   ├── Navbar.jsx
         │   ├── ProtectedRoute.jsx
         │   ├── EditorToolbar.jsx
-        │   └── AuthCallback.jsx
+        │   ├── StepIndicator.jsx
+        │   ├── Reactions.jsx
+        │   ├── ReadStatus.jsx
+        │   └── Notes.jsx
         └── pages/
             ├── LoginPage.jsx
             ├── RegisterPage.jsx
             ├── DashboardPage.jsx
             ├── ExplorePage.jsx
             ├── MaterialPage.jsx
-            └── EditorPage.jsx
+            ├── ProfilePage.jsx
+            ├── AuthCallback.jsx
+            └── editor/
+                ├── MetadataStep.jsx
+                ├── ContentStep.jsx
+                └── ReviewStep.jsx
 ```
 
 ---

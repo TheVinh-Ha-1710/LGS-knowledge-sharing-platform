@@ -118,6 +118,13 @@ reactions
   ├── material_id → materials
   └── type (helpful | mindblown | needs_work)
 
+notes
+  ├── user_id → users
+  ├── material_id → materials
+  ├── content (plain text)
+  └── created_at, updated_at
+  (UNIQUE constraint on user_id + material_id)
+
 blocklist
   ├── token (PRIMARY KEY)
   └── expires_at
@@ -138,6 +145,39 @@ All schema changes go through migration files in `migrations/`. The `node-pg-mig
 
 **Why not `CREATE TABLE IF NOT EXISTS` in code?**
 `IF NOT EXISTS` only handles table creation. It cannot add columns, change constraints, or rename things once a table exists. Migrations handle the full lifecycle of schema evolution — every change is versioned, reversible, and tracked in git alongside the code that depends on it.
+
+---
+
+## Route overview
+
+| Method | Path | File | Auth | Description |
+|---|---|---|---|---|
+| POST | /api/register | routes/auth.js | No | Register new account |
+| POST | /api/login | routes/auth.js | No | Login with email/password |
+| POST | /api/logout | routes/auth.js | No | Logout and blocklist token |
+| GET | /api/me | routes/auth.js | Yes | Get current user |
+| GET | /api/auth/google | routes/auth.js | No | Redirect to Google OAuth |
+| GET | /api/auth/google/callback | routes/auth.js | No | OAuth callback |
+| POST | /api/login/callback | routes/auth.js | No | Exchange OAuth token for cookie |
+| GET | /api/fields | routes/fields.js | No | List all fields |
+| GET | /api/materials | routes/materials.js | No | List published materials |
+| GET | /api/materials/:slug | routes/materials.js | No | Get material by slug |
+| GET | /api/materials/id/:id | routes/materials.js | No | Get material by ID |
+| POST | /api/materials/:slug/view | routes/materials.js | No | Increment view count |
+| POST | /api/materials | routes/materials.js | Yes | Create material |
+| PUT | /api/materials/:id | routes/materials.js | Yes | Update material |
+| DELETE | /api/materials/:id | routes/materials.js | Yes | Delete material |
+| GET | /api/reactions/:materialId | routes/reactions.js | Yes | Get reaction counts |
+| POST | /api/reactions/:materialId | routes/reactions.js | Yes | Toggle reaction |
+| GET | /api/reads/:materialId | routes/reads.js | Yes | Get read status |
+| POST | /api/reads/:materialId | routes/reads.js | Yes | Toggle read/complete |
+| GET | /api/stats/leaderboard | routes/stats.js | No | Top 10 contributors |
+| GET | /api/stats/trending | routes/stats.js | No | Top 5 most viewed |
+| GET | /api/users/me | routes/users.js | Yes | Full own profile |
+| GET | /api/users/:username | routes/users.js | No | Public user profile |
+| GET | /api/notes/:materialId | routes/notes.js | Yes | Get own note |
+| POST | /api/notes/:materialId | routes/notes.js | Yes | Create or update note |
+| DELETE | /api/notes/:materialId | routes/notes.js | Yes | Delete note |
 
 ---
 

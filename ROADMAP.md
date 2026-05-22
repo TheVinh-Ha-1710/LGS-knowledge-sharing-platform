@@ -4,7 +4,9 @@ This document tracks the current state of let's.get.smarter and what's planned n
 
 ---
 
-## Current — v1.0.0 (MVP)
+## Shipped
+
+### v1.0.0 — MVP ✅
 
 Core knowledge sharing platform with authentication and rich text editing.
 
@@ -17,23 +19,50 @@ Core knowledge sharing platform with authentication and rich text editing.
 - ✅ View count tracking
 - ✅ Community dashboard with basic stats
 
+### v1.0.1 — Stability & Editor ✅
+
+- ✅ View count fix — increments once per visit not on tab switch
+- ✅ Knowledge base restricted to authenticated users only
+- ✅ Google OAuth button fixed for production
+- ✅ trust proxy added for Railway reverse proxy
+- ✅ 3-step editor — Metadata → Content → Review with draft auto-save
+
+### v1.1.0 — Engagement Features ✅
+
+- ✅ Reactions on materials — helpful, mindblown, needs work with toggle
+- ✅ Read tracking — mark as read and mark as complete per user
+- ✅ Learning streaks — current and longest streak from completion history
+- ✅ Profile pages — own full profile and public limited view
+- ✅ Contributor leaderboard on dashboard
+- ✅ Trending materials on dashboard
+- ✅ Personal notes on materials — private per-user with profile preview
+
 ---
 
-## Next — v1.1.0 (Engagement)
+## Upcoming
 
-Features that encourage active participation and return visits.
+### v1.1.1 — UI Polish & Refinement
 
-- [ ] Reactions on materials (helpful, mind blown, needs work)
-- [ ] Read tracking — mark materials as completed
-- [ ] Learning streaks — consecutive days with activity
-- [ ] Personal profile page — your contributions and reading history
-- [ ] Contributor leaderboard on dashboard
-- [ ] Trending materials — most viewed in last 7 days
-- [ ] Personal notes/annotations on materials (private)
+- [ ] Consistent spacing, typography and component styles
+- [ ] Mobile responsiveness improvements
+- [ ] Loading states and empty states polish
+- [ ] Error handling and user feedback improvements
 
----
+### v1.1.2 — Content Editor Improvements
 
-## Next — v1.2.0 (Discovery)
+- [ ] Improved toolbar with more formatting options
+- [ ] Image upload support
+- [ ] Better code block language selection
+- [ ] Word count and reading time estimate
+
+### v1.1.3 — Inline Highlights & Annotations
+
+- [ ] Text selection → highlight with color
+- [ ] Inline annotation attached to highlight
+- [ ] Highlight persistence across edits
+- [ ] Full annotations list on profile
+
+### v1.2.0 — Discovery
 
 Features that make it easier to find relevant content.
 
@@ -43,9 +72,7 @@ Features that make it easier to find relevant content.
 - [ ] "New since last visit" indicator on dashboard
 - [ ] Weekly digest email — what was added this week
 
----
-
-## Next — v1.3.0 (AI assistant)
+### v1.3.0 — AI Assistant
 
 AI-powered learning features using the knowledge base as context.
 
@@ -55,9 +82,7 @@ AI-powered learning features using the knowledge base as context.
 - [ ] Summarise — quick summary of any material
 - [ ] Development: Ollama (local, free) → Production: Anthropic API
 
----
-
-## Future — v2.0.0 (Platform)
+### v2.0.0 — Platform
 
 Larger features for when the platform has more users and content.
 
