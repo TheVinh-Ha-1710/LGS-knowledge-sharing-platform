@@ -7,6 +7,7 @@ import DOMPurify from 'dompurify'
 import { useEffect } from 'react'
 import Reactions from '../components/Reactions'
 import ReadStatus from '../components/ReadStatus'
+import Notes from '../components/Notes'
 
 function MaterialPage() {
   const { slug } = useParams()
@@ -147,6 +148,9 @@ function MaterialPage() {
           <ReadStatus materialId={material?.id} />
         </div>
       )}
+
+      {/* Private notes — only visible to logged in user */}
+      <Notes materialId={material?.id} />
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

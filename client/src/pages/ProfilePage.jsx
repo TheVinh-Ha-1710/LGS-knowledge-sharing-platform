@@ -244,6 +244,48 @@ function ProfilePage() {
         </div>
       )}
 
+      {/* Notes — own profile only */}
+      {isOwnProfile && profile?.notes?.length > 0 && (
+        <div style={{ marginBottom: 36 }}>
+          <div className="section-header" style={{ marginBottom: 16 }}>
+            <span className="section-title">My notes</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {profile.notes.map(note => (
+              <Link
+                key={note.id}
+                to={`/materials/${note.slug}`}
+                style={{ textDecoration: 'none' }}
+              >
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  padding: '12px 16px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 14 }}>{note.field_icon}</span>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+                      {note.title}
+                    </span>
+                  </div>
+                  <p style={{
+                    fontSize: 12,
+                    color: 'var(--text-3)',
+                    margin: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {note.content}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

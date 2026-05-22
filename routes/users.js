@@ -97,6 +97,17 @@ router.get('/me', requireAuth, async (req, res) => {
       FROM streaks
     `, [req.user.id])
 
+    const notes = await pool.query(`
+      SELECT n.id, n.content, n.updated_at,
+        m.title, m.slug,
+        f.name as field_name, f.icon as field_icon
+      FROM notes n
+      JOIN materials m ON m.id = n.material_id
+      LEFT JOIN fields f ON f.id = m.field_id
+      WHERE n.user_id = $1
+      ORDER BY n.updated_at DESC
+    `, [req.user.id])
+
     res.json({
       user: user.rows[0],
       stats: {
@@ -106,7 +117,8 @@ router.get('/me', requireAuth, async (req, res) => {
         longest_streak: streakData.rows[0]?.longest_streak || 0
       },
       materials: materials.rows,
-      reads: reads.rows
+      reads: reads.rows,
+      notes: notes.rows
     })
   } catch (err) {
     res.status(500).json({ error: err.message })

@@ -51,5 +51,15 @@ export const api = {
 
   //users
   getMyProfile: () => request('/users/me'),
-  getUserProfile: (username) => request(`/users/${username}`)
+  getUserProfile: (username) => request(`/users/${username}`),
+
+  // notes
+  getNote: (materialId) => request(`/notes/${materialId}`),
+  saveNote: (materialId, content) => request(`/notes/${materialId}`, {
+    method: 'POST',
+    body: JSON.stringify({ content })
+  }),
+  deleteNote: (materialId) => request(`/notes/${materialId}`, {
+    method: 'DELETE'
+  })
 }

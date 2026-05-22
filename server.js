@@ -24,6 +24,7 @@ app.use('/api/reactions', require('./routes/reactions'))
 app.use('/api/reads', require('./routes/reads'))
 app.use('/api/stats', require('./routes/stats'))
 app.use('/api/users', require('./routes/users'))
+app.use('/api/notes', require('./routes/notes'))
 
 // Serve React build
 app.use(express.static(path.join(__dirname, 'client/dist')))
