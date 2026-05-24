@@ -6,8 +6,19 @@ import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
 import { createLowlight, common } from 'lowlight'
 import StepIndicator from '../../components/StepIndicator'
 import EditorToolbar from '../../components/EditorToolbar'
+import Image from '@tiptap/extension-image'
 
 const lowlight = createLowlight(common)
+
+function getStats(html) {
+  // Strip HTML tags to get plain text
+  const text = html?.replace(/<[^>]*>/g, '') || ''
+  // Count words — split on whitespace, filter empty strings
+  const words = text.trim().split(/\s+/).filter(Boolean).length
+  // Average reading speed — 200 words per minute
+  const minutes = Math.ceil(words / 200)
+  return { words, minutes }
+}
 
 function ContentStep() {
   const { id } = useParams()
@@ -20,10 +31,13 @@ function ContentStep() {
     clearDraft
   } = useEditor()
 
+  const stats = getStats(content)
+
   const editor = useTipTap({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
-      CodeBlockLowlight.configure({ lowlight })
+      CodeBlockLowlight.configure({ lowlight }),
+      Image.configure({ inline: false })
     ],
     content: content || '',
     onUpdate: ({ editor }) => {
@@ -76,6 +90,19 @@ function ContentStep() {
       <div className="editor-wrap" style={{ marginBottom: 6 }}>
         <EditorToolbar editor={editor} />
         <EditorContent editor={editor} />
+      </div>
+
+      <div style={{
+        display: 'flex',
+        gap: 12,
+        fontFamily: 'var(--font-mono)',
+        fontSize: 11,
+        color: 'var(--text-4)',
+        marginTop: 6
+      }}>
+        <span>{stats.words} words</span>
+        <span>·</span>
+        <span>~{stats.minutes} min read</span>
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 16 }}>

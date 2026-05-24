@@ -1,13 +1,51 @@
+import { useRef, useState } from 'react'
+import { api } from '../api'
+
+const LANGUAGES = [
+  { value: '',           label: 'Plain text' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'python',     label: 'Python' },
+  { value: 'sql',        label: 'SQL' },
+  { value: 'html',       label: 'HTML' },
+  { value: 'css',        label: 'CSS' },
+  { value: 'bash',       label: 'Bash' },
+  { value: 'java',       label: 'Java' },
+  { value: 'json',       label: 'JSON' },
+]
+
 function EditorToolbar({ editor }) {
+  const fileInputRef = useRef(null)
+  const [uploading, setUploading] = useState(false)
+
   if (!editor) return null
+
+  // Handle image file selection and upload to Cloudinary via backend
+  async function handleImageUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const { url } = await api.uploadImage(file)
+      // Insert image at current cursor position
+      editor.chain().focus().setImage({ src: url }).run()
+    } catch (err) {
+      console.error('Image upload failed:', err.message)
+    } finally {
+      setUploading(false)
+      // Reset input so same file can be re-selected
+      e.target.value = ''
+    }
+  }
 
   const tools = [
     {
       group: 'text',
       items: [
-        { label: 'B', title: 'Bold', action: () => editor.chain().focus().toggleBold().run(), active: editor.isActive('bold') },
-        { label: 'I', title: 'Italic', action: () => editor.chain().focus().toggleItalic().run(), active: editor.isActive('italic') },
-        { label: 'S', title: 'Strikethrough', action: () => editor.chain().focus().toggleStrike().run(), active: editor.isActive('strike') },
+        { label: 'B',  title: 'Bold',          action: () => editor.chain().focus().toggleBold().run(),          active: editor.isActive('bold') },
+        { label: 'I',  title: 'Italic',         action: () => editor.chain().focus().toggleItalic().run(),        active: editor.isActive('italic') },
+        { label: 'S',  title: 'Strikethrough',  action: () => editor.chain().focus().toggleStrike().run(),        active: editor.isActive('strike') },
       ]
     },
     {
@@ -21,16 +59,17 @@ function EditorToolbar({ editor }) {
     {
       group: 'lists',
       items: [
-        { label: '•—', title: 'Bullet list', action: () => editor.chain().focus().toggleBulletList().run(), active: editor.isActive('bulletList') },
-        { label: '1.', title: 'Ordered list', action: () => editor.chain().focus().toggleOrderedList().run(), active: editor.isActive('orderedList') },
+        { label: '•—', title: 'Bullet list',   action: () => editor.chain().focus().toggleBulletList().run(),   active: editor.isActive('bulletList') },
+        { label: '1.', title: 'Ordered list',  action: () => editor.chain().focus().toggleOrderedList().run(),  active: editor.isActive('orderedList') },
       ]
     },
     {
       group: 'blocks',
       items: [
-        { label: '</', title: 'Code block', action: () => editor.chain().focus().toggleCodeBlock().run(), active: editor.isActive('codeBlock') },
-        { label: '❝', title: 'Blockquote', action: () => editor.chain().focus().toggleBlockquote().run(), active: editor.isActive('blockquote') },
-        { label: '—', title: 'Horizontal rule', action: () => editor.chain().focus().setHorizontalRule().run(), active: false },
+        { label: '</',                 title: 'Code block',      action: () => editor.chain().focus().toggleCodeBlock().run(),    active: editor.isActive('codeBlock') },
+        { label: '❝',                  title: 'Blockquote',      action: () => editor.chain().focus().toggleBlockquote().run(),   active: editor.isActive('blockquote') },
+        { label: '—',                  title: 'Horizontal rule', action: () => editor.chain().focus().setHorizontalRule().run(),  active: false },
+        { label: uploading ? '...' : '🖼', title: 'Upload image', action: () => fileInputRef.current?.click(), active: false },
       ]
     }
   ]
@@ -39,10 +78,7 @@ function EditorToolbar({ editor }) {
     <div className="editor-toolbar">
       {tools.map((group, groupIndex) => (
         <div key={group.group} style={{ display: 'flex', gap: 2 }}>
-          {/* Divider between groups */}
-          {groupIndex > 0 && (
-            <div className="editor-toolbar-divider" />
-          )}
+          {groupIndex > 0 && <div className="editor-toolbar-divider" />}
           {group.items.map(tool => (
             <button
               key={tool.label}
@@ -50,12 +86,50 @@ function EditorToolbar({ editor }) {
               className={`editor-toolbar-btn ${tool.active ? 'active' : ''}`}
               onClick={tool.action}
               type="button"
+              disabled={tool.title === 'Upload image' && uploading}
             >
               {tool.label}
             </button>
           ))}
         </div>
       ))}
+
+      {/* Language selector — only visible when cursor is inside a code block */}
+      {editor.isActive('codeBlock') && (
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className="editor-toolbar-divider" />
+          <select
+            value={editor.getAttributes('codeBlock').language || ''}
+            onChange={e => editor.chain().focus().updateAttributes('codeBlock', {
+              language: e.target.value
+            }).run()}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              padding: '3px 8px',
+              border: '0.5px solid var(--border)',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--bg)',
+              color: 'var(--text-3)',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
+            {LANGUAGES.map(lang => (
+              <option key={lang.value} value={lang.value}>{lang.label}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Hidden file input — triggered by image button click */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleImageUpload}
+      />
     </div>
   )
 }

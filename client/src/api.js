@@ -61,5 +61,19 @@ export const api = {
   }),
   deleteNote: (materialId) => request(`/notes/${materialId}`, {
     method: 'DELETE'
-  })
+  }),
+
+  // upload
+  uploadImage: async (file) => {
+    const formData = new FormData()
+    formData.append('image', file)
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData  // no Content-Type header — browser sets it with boundary
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Upload failed')
+    return data
+  }
 }
