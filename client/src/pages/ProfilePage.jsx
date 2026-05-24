@@ -12,7 +12,6 @@ function ProfilePage() {
   const loggedInUsername = user?.email?.split('@')[0]
   const isOwnProfile = !username
 
-  // ALL hooks must be declared before any conditional returns
   const { data: ownProfile, isLoading: ownLoading } = useQuery({
     queryKey: ['profile', 'me'],
     queryFn: api.getMyProfile,
@@ -25,7 +24,6 @@ function ProfilePage() {
     enabled: !isOwnProfile && username !== loggedInUsername
   })
 
-  // Redirect own username to full profile — after all hooks
   if (username && username === loggedInUsername) {
     return <Navigate to="/profile" replace />
   }
@@ -49,68 +47,52 @@ function ProfilePage() {
     ? profile?.user?.email?.split('@')[0]
     : profile?.user?.username
 
+  // Generate initials for avatar
+  const initials = displayName?.slice(0, 2).toUpperCase() || '??'
+
   const currentStreak = profile?.stats?.current_streak || 0
   const longestStreak = profile?.stats?.longest_streak || 0
 
   return (
-    <div className="app-page" style={{ maxWidth: 740 }}>
+    <div className="app-page-wide">
 
-      {/* Back button — only on public profiles */}
+      {/* Back button — public profiles only */}
       {!isOwnProfile && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{ background: 'none', border: 'none', color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 11, cursor: 'pointer', padding: 0, marginBottom: 28, letterSpacing: '0.08em' }}
-        >
+        <button className="back-btn" onClick={() => navigate(-1)}>
           ← back
         </button>
       )}
 
       {/* Profile header */}
-      <div style={{ marginBottom: 32 }}>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8 }}>
-          // profile
-        </p>
-        <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 6 }}>
-          {displayName}
-        </h1>
-
-        {isOwnProfile && (
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 4 }}>
-            {profile?.user?.email}
-          </p>
-        )}
-
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)' }}>
-          member since {new Date(profile?.user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-        </p>
-
-        {/* Streak banner — own profile only, only if streak > 0 */}
-        {isOwnProfile && currentStreak > 0 && (
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'var(--accent-dim)',
-            border: '1px solid var(--accent)',
-            borderRadius: 6,
-            padding: '6px 12px',
-            marginTop: 12,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            color: 'var(--accent)'
-          }}>
-            🔥 {currentStreak} day streak
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 32 }}>
+        <div className="avatar">{initials}</div>
+        <div>
+          <div className="page-eyebrow">// profile</div>
+          <h1 className="page-title-sm">{displayName}</h1>
+          {isOwnProfile && (
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-4)', marginBottom: 4 }}>
+              {profile?.user?.email}
+            </div>
+          )}
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-4)', marginBottom: 10 }}>
+            member since {new Date(profile?.user?.created_at).toLocaleDateString('en-US', {
+              year: 'numeric', month: 'long'
+            })}
           </div>
-        )}
+          {isOwnProfile && currentStreak > 0 && (
+            <div className="streak-badge">
+              🔥 {currentStreak} day streak
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Stats row */}
-      <div className="stats-row" style={{ marginBottom: 36 }}>
+      {/* Stats */}
+      <div className="stats-row" style={{ marginBottom: 32 }}>
         <div className="stat-card">
           <div className="stat-label">Authored</div>
           <div className="stat-value">{profile?.stats?.materials_authored || 0}</div>
         </div>
-
         {isOwnProfile && (
           <>
             <div className="stat-card">
@@ -123,12 +105,10 @@ function ProfilePage() {
             </div>
           </>
         )}
-
         <div className="stat-card">
           <div className="stat-label">Reactions received</div>
           <div className="stat-value">{profile?.stats?.reactions_received || 0}</div>
         </div>
-
         {isOwnProfile && (
           <>
             <div className="stat-card">
@@ -137,7 +117,7 @@ function ProfilePage() {
             </div>
             <div className="stat-card">
               <div className="stat-label">🔥 Current streak</div>
-              <div className="stat-value">{currentStreak} days</div>
+              <div className="stat-value accent">{currentStreak} days</div>
             </div>
             <div className="stat-card">
               <div className="stat-label">Best streak</div>
@@ -147,14 +127,13 @@ function ProfilePage() {
         )}
       </div>
 
-      {/* Materials authored */}
+      {/* Materials */}
       <div style={{ marginBottom: 36 }}>
-        <div className="section-header" style={{ marginBottom: 16 }}>
+        <div className="section-header" style={{ marginBottom: 14 }}>
           <span className="section-title">
             {isOwnProfile ? 'My materials' : `Materials by ${displayName}`}
           </span>
         </div>
-
         {profile?.materials?.length > 0 ? (
           <div className="materials-grid">
             {profile.materials.map(material => (
@@ -178,61 +157,29 @@ function ProfilePage() {
       {/* Reading history — own profile only */}
       {isOwnProfile && (
         <div style={{ marginBottom: 36 }}>
-          <div className="section-header" style={{ marginBottom: 16 }}>
+          <div className="section-header" style={{ marginBottom: 14 }}>
             <span className="section-title">Reading history</span>
           </div>
-
           {profile?.reads?.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {profile.reads.map(read => (
                 <Link
                   key={read.id}
                   to={`/materials/${read.slug}`}
-                  style={{ textDecoration: 'none' }}
+                  className="read-history-item"
                 >
-                  <div style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 8,
-                    padding: '12px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    transition: 'border-color 0.15s'
-                  }}>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 12,
-                      color: read.completed ? 'var(--green)' : 'var(--accent)',
-                      flexShrink: 0
-                    }}>
-                      {read.completed ? '✓' : '📖'}
-                    </span>
-
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>
-                      {read.field_icon}
-                    </span>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {read.title}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)' }}>
-                        {read.field_name}
-                      </div>
-                    </div>
-
-                    <DifficultyBadge difficulty={read.difficulty} />
-
-                    <span style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 10,
-                      color: read.completed ? 'var(--green)' : 'var(--text-3)',
-                      flexShrink: 0
-                    }}>
-                      {read.completed ? 'completed' : 'reading'}
-                    </span>
+                  <span className="read-history-status">
+                    {read.completed ? '✓' : '📖'}
+                  </span>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{read.field_icon}</span>
+                  <div className="read-history-body">
+                    <div className="read-history-title">{read.title}</div>
+                    <div className="read-history-field">{read.field_name}</div>
                   </div>
+                  <DifficultyBadge difficulty={read.difficulty} />
+                  <span className={`read-history-label ${read.completed ? 'completed' : 'reading'}`}>
+                    {read.completed ? 'completed' : 'reading'}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -247,38 +194,27 @@ function ProfilePage() {
       {/* Notes — own profile only */}
       {isOwnProfile && profile?.notes?.length > 0 && (
         <div style={{ marginBottom: 36 }}>
-          <div className="section-header" style={{ marginBottom: 16 }}>
+          <div className="section-header" style={{ marginBottom: 14 }}>
             <span className="section-title">My notes</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {profile.notes.map(note => (
               <Link
                 key={note.id}
                 to={`/materials/${note.slug}`}
-                style={{ textDecoration: 'none' }}
+                className="read-history-item"
               >
-                <div style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 8,
-                  padding: '12px 16px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 14 }}>{note.field_icon}</span>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
-                      {note.title}
-                    </span>
-                  </div>
-                  <p style={{
-                    fontSize: 12,
-                    color: 'var(--text-3)',
-                    margin: 0,
+                <span style={{ fontSize: 16 }}>{note.field_icon}</span>
+                <div className="read-history-body">
+                  <div className="read-history-title">{note.title}</div>
+                  <div className="read-history-field" style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    maxWidth: 300
                   }}>
                     {note.content}
-                  </p>
+                  </div>
                 </div>
               </Link>
             ))}

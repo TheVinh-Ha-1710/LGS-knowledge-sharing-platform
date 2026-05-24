@@ -1,50 +1,39 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEditor } from '../../context/EditorContext'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useQuery } from '@tanstack/react-query'
+import { useToast } from '../../context/ToastContext'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../api'
-import { DifficultyBadge, getFieldAccent } from '../../utils.jsx'
+import { DifficultyBadge } from '../../utils.jsx'
 import DOMPurify from 'dompurify'
 import StepIndicator from '../../components/StepIndicator'
 
 function ReviewStep() {
-  // Read :id from URL — present when editing, undefined when creating
   const { id } = useParams()
   const navigate = useNavigate()
   const isEditing = !!id
   const queryClient = useQueryClient()
+  const toast = useToast()
 
-  // Pull all shared state from EditorContext
-  // This is a read-only step — no setters needed, just displaying what was entered
   const {
-    title,
-    fieldId,
-    difficulty,
-    tags,
-    content,
-    existingSlug,
-    clearDraft
+    title, fieldId, difficulty, tags, content,
+    existingSlug, clearDraft
   } = useEditor()
 
-  // Fetch fields to resolve fieldId → field name and icon for display
-  // We only have fieldId (a number) in context, not the full field object
+  // Fetch fields to resolve fieldId → field name and icon
   const { data: fields } = useQuery({
     queryKey: ['fields'],
     queryFn: api.getFields
   })
 
-  // Find the full field object that matches the selected fieldId
   const selectedField = fields?.find(f => String(f.id) === String(fieldId))
 
-  // Parse tags from comma-separated string into a clean array
-  // e.g. "react, javascript, hooks" → ['react', 'javascript', 'hooks']
+  // Parse tags from comma-separated string into array
   const tagsArray = tags
     .split(',')
     .map(t => t.trim())
     .filter(Boolean)
 
-  // --- CREATE MUTATION ---
-  // Fires when publishing a brand new material
+  // Create mutation — new material
   const createMutation = useMutation({
     mutationFn: () => api.createMaterial({
       title,
@@ -54,17 +43,17 @@ function ReviewStep() {
       tags: tagsArray
     }),
     onSuccess: (newMaterial) => {
-      // Invalidate the materials list cache so Explore and Dashboard show the new material
       queryClient.invalidateQueries({ queryKey: ['materials'] })
-      // Clear draft from localStorage — we're done with it
       clearDraft()
-      // Navigate to the newly created material
+      toast.success('Material published!')
       navigate(`/materials/${newMaterial.slug}`)
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Failed to publish material')
     }
   })
 
-  // --- UPDATE MUTATION ---
-  // Fires when saving changes to an existing material
+  // Update mutation — existing material
   const updateMutation = useMutation({
     mutationFn: () => api.updateMaterial(id, {
       title,
@@ -74,39 +63,32 @@ function ReviewStep() {
       tags: tagsArray
     }),
     onSuccess: () => {
-      // Invalidate both the list and the individual material cache
       queryClient.invalidateQueries({ queryKey: ['materials'] })
       queryClient.invalidateQueries({ queryKey: ['material', id] })
-      // Clear draft from localStorage — edit session complete
       clearDraft()
-      // Navigate back to the material we just edited
+      toast.success('Changes saved')
       navigate(`/materials/${existingSlug}`)
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Failed to save changes')
     }
   })
 
   function handlePublish() {
-    // Route to the correct mutation based on create vs edit
-    if (isEditing) {
-      updateMutation.mutate()
-    } else {
-      createMutation.mutate()
-    }
+    isEditing ? updateMutation.mutate() : createMutation.mutate()
   }
 
   function handleBack() {
-    // Navigate back to content step — context preserves all data
     navigate(isEditing ? `/editor/${id}/content` : '/editor/content')
   }
 
   function handleCancel() {
     if (isEditing) {
-      // Edit flow — simple confirm, no draft option
       if (window.confirm('Discard all changes?')) {
         clearDraft()
         navigate(`/materials/${existingSlug}`)
       }
     } else {
-      // Create flow — offer to save draft or discard completely
       const save = window.confirm('OK to save draft and come back later.\nCancel to discard everything.')
       if (save) {
         navigate('/explore')
@@ -118,39 +100,33 @@ function ReviewStep() {
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending
-  const fieldAccent = getFieldAccent(selectedField?.slug)
 
   return (
-    <div className="app-page" style={{ maxWidth: 720 }}>
-
-      {/* Progress indicator — shows user is on step 3 of 3 */}
+    <div className="app-page-wide">
       <StepIndicator currentStep={3} />
 
-      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>
-        Review
+      <div className="page-eyebrow">
+        {isEditing ? '// edit material' : '// new material'}
+      </div>
+      <h1 className="page-title-sm" style={{ marginBottom: 4 }}>
+        Looks good?
       </h1>
-      <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 32 }}>
-        // step 3 of 3 — check everything before publishing
+      <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-4)', marginBottom: 24 }}>
+        // step 3 of 3 — review before publishing
       </p>
 
-      {/* Summary card — shows all metadata at a glance */}
+      {/* Review card — shows exactly how the published material will look */}
       <div style={{
         background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: 8,
+        border: '0.5px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
         padding: 24,
-        marginBottom: 24
+        marginBottom: 20
       }}>
-
-        {/* Field + difficulty row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        {/* Field + difficulty */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
           {selectedField && (
-            <span style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              color: fieldAccent,
-              letterSpacing: '0.08em'
-            }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)' }}>
               {selectedField.icon} {selectedField.name}
             </span>
           )}
@@ -158,81 +134,74 @@ function ReviewStep() {
         </div>
 
         {/* Title */}
-        <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10, letterSpacing: '-0.02em' }}>
-          {title || <span style={{ color: 'var(--text-3)' }}>// no title</span>}
+        <h2 style={{
+          fontSize: 20,
+          fontWeight: 500,
+          marginBottom: 10,
+          letterSpacing: '-0.01em',
+          color: 'var(--text)',
+          lineHeight: 1.3
+        }}>
+          {title || (
+            <span style={{ color: 'var(--text-4)', fontStyle: 'italic' }}>
+              No title — go back and add one
+            </span>
+          )}
         </h2>
 
         {/* Tags */}
         {tagsArray.length > 0 && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}>
             {tagsArray.map(tag => (
-              <span
-                key={tag}
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 10,
-                  padding: '2px 8px',
-                  background: 'var(--accent-dim)',
-                  color: 'var(--accent)',
-                  borderRadius: 3,
-                  letterSpacing: '0.05em'
-                }}
-              >
+              <span key={tag} style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 10,
+                padding: '2px 8px',
+                background: 'var(--bg-2)',
+                color: 'var(--text-3)',
+                borderRadius: 'var(--radius-full)',
+                border: '0.5px solid var(--border)'
+              }}>
                 #{tag}
               </span>
             ))}
           </div>
         )}
 
-        {/* Divider */}
-        <div style={{ height: 1, background: 'var(--border)', marginBottom: 20 }} />
+        <div className="divider" style={{ margin: '16px 0' }} />
 
-        {/* Content preview — safely rendered HTML from TipTap */}
+        {/* Content preview */}
         {content ? (
           <div
             className="material-content"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(content)
-            }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
           />
         ) : (
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-3)' }}>
-            // no content yet — go back to add some
-          </p>
+          <div className="empty-state" style={{ padding: '16px 0', textAlign: 'left' }}>
+            // no content yet — go back and write something
+          </div>
         )}
       </div>
 
-      {/* Error display */}
-      {(createMutation.error || updateMutation.error) && (
-        <div className="alert alert-error" style={{ marginBottom: 16 }}>
-          ⚠ {createMutation.error?.message || updateMutation.error?.message}
-        </div>
-      )}
-
-      {/* Actions — Publish/Save is the final action, Back returns to step 2 */}
-      <div style={{ display: 'flex', gap: 8 }}>
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <button
+          className="btn btn-primary"
           onClick={handlePublish}
           disabled={isPending}
-          className="btn btn-primary"
-          style={{ width: 'auto', padding: '10px 28px' }}
         >
           {isPending
             ? 'Saving...'
-            : isEditing ? 'Save changes' : 'Publish'
+            : isEditing ? 'Save changes' : 'Publish →'
           }
         </button>
-        <button
-          onClick={handleBack}
-          className="btn btn-ghost"
-          style={{ width: 'auto', padding: '10px 20px' }}
-        >
+        <button className="btn btn-ghost" onClick={handleBack}>
           ← Back
         </button>
         <button
-          onClick={handleCancel}
           className="btn btn-ghost"
-          style={{ width: 'auto', padding: '10px 20px' }}
+          onClick={handleCancel}
+          style={{ color: 'var(--text-4)', borderColor: 'transparent' }}
         >
           Cancel
         </button>

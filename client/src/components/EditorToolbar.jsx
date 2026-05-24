@@ -1,151 +1,61 @@
-// EditorToolbar.jsx
-// Drop this in client/src/components/EditorToolbar.jsx
-
-function ToolbarButton({ onClick, active, title, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      style={{
-        padding: '4px 8px',
-        background: active ? 'var(--accent-dim)' : 'transparent',
-        border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
-        borderRadius: 4,
-        color: active ? 'var(--accent)' : 'var(--text-2)',
-        cursor: 'pointer',
-        fontFamily: 'var(--font-mono)',
-        fontSize: 12,
-        transition: 'all 0.15s',
-        minWidth: 28,
-      }}
-    >
-      {children}
-    </button>
-  )
-}
-
-function Divider() {
-  return (
-    <div style={{
-      width: 1,
-      height: 20,
-      background: 'var(--border)',
-      margin: '0 4px',
-      alignSelf: 'center'
-    }} />
-  )
-}
-
 function EditorToolbar({ editor }) {
   if (!editor) return null
 
+  const tools = [
+    {
+      group: 'text',
+      items: [
+        { label: 'B', title: 'Bold', action: () => editor.chain().focus().toggleBold().run(), active: editor.isActive('bold') },
+        { label: 'I', title: 'Italic', action: () => editor.chain().focus().toggleItalic().run(), active: editor.isActive('italic') },
+        { label: 'S', title: 'Strikethrough', action: () => editor.chain().focus().toggleStrike().run(), active: editor.isActive('strike') },
+      ]
+    },
+    {
+      group: 'headings',
+      items: [
+        { label: 'H1', title: 'Heading 1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: editor.isActive('heading', { level: 1 }) },
+        { label: 'H2', title: 'Heading 2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: editor.isActive('heading', { level: 2 }) },
+        { label: 'H3', title: 'Heading 3', action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: editor.isActive('heading', { level: 3 }) },
+      ]
+    },
+    {
+      group: 'lists',
+      items: [
+        { label: '•—', title: 'Bullet list', action: () => editor.chain().focus().toggleBulletList().run(), active: editor.isActive('bulletList') },
+        { label: '1.', title: 'Ordered list', action: () => editor.chain().focus().toggleOrderedList().run(), active: editor.isActive('orderedList') },
+      ]
+    },
+    {
+      group: 'blocks',
+      items: [
+        { label: '</', title: 'Code block', action: () => editor.chain().focus().toggleCodeBlock().run(), active: editor.isActive('codeBlock') },
+        { label: '❝', title: 'Blockquote', action: () => editor.chain().focus().toggleBlockquote().run(), active: editor.isActive('blockquote') },
+        { label: '—', title: 'Horizontal rule', action: () => editor.chain().focus().setHorizontalRule().run(), active: false },
+      ]
+    }
+  ]
+
   return (
-    <div style={{
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: 4,
-      padding: '8px 10px',
-      borderBottom: '1px solid var(--border)',
-      background: 'var(--surface-2)',
-      borderRadius: '4px 4px 0 0',
-      alignItems: 'center'
-    }}>
-
-      {/* Headings */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        active={editor.isActive('heading', { level: 1 })}
-        title="Heading 1"
-      >H1</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        active={editor.isActive('heading', { level: 2 })}
-        title="Heading 2"
-      >H2</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        active={editor.isActive('heading', { level: 3 })}
-        title="Heading 3"
-      >H3</ToolbarButton>
-
-      <Divider />
-
-      {/* Text formatting */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        active={editor.isActive('bold')}
-        title="Bold (Ctrl+B)"
-      ><strong>B</strong></ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        active={editor.isActive('italic')}
-        title="Italic (Ctrl+I)"
-      ><em>I</em></ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        active={editor.isActive('strike')}
-        title="Strikethrough"
-      ><s>S</s></ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCode().run()}
-        active={editor.isActive('code')}
-        title="Inline code"
-      >`code`</ToolbarButton>
-
-      <Divider />
-
-      {/* Lists */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        active={editor.isActive('bulletList')}
-        title="Bullet list"
-      >• list</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        active={editor.isActive('orderedList')}
-        title="Ordered list"
-      >1. list</ToolbarButton>
-
-      <Divider />
-
-      {/* Blocks */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        active={editor.isActive('blockquote')}
-        title="Blockquote"
-      >" quote</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        active={editor.isActive('codeBlock')}
-        title="Code block"
-      >{'</>'}  block</ToolbarButton>
-
-      <Divider />
-
-      {/* Utilities */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        title="Horizontal rule"
-      >— rule</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().undo().run()}
-        title="Undo (Ctrl+Z)"
-      >↩ undo</ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().redo().run()}
-        title="Redo (Ctrl+Y)"
-      >↪ redo</ToolbarButton>
-
+    <div className="editor-toolbar">
+      {tools.map((group, groupIndex) => (
+        <div key={group.group} style={{ display: 'flex', gap: 2 }}>
+          {/* Divider between groups */}
+          {groupIndex > 0 && (
+            <div className="editor-toolbar-divider" />
+          )}
+          {group.items.map(tool => (
+            <button
+              key={tool.label}
+              title={tool.title}
+              className={`editor-toolbar-btn ${tool.active ? 'active' : ''}`}
+              onClick={tool.action}
+              type="button"
+            >
+              {tool.label}
+            </button>
+          ))}
+        </div>
+      ))}
     </div>
   )
 }

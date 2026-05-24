@@ -11,6 +11,7 @@ import MetadataStep from './pages/editor/MetadataStep'
 import ContentStep from './pages/editor/ContentStep'
 import ReviewStep from './pages/editor/ReviewStep'
 import ProfilePage from './pages/ProfilePage'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   return (
@@ -25,47 +26,91 @@ function App() {
         {/* Root redirect */}
         <Route path="/" element={<Navigate to="/dashboard" />} />
 
-        {/* App routes — protected */}
+        {/* App routes — protected + error boundary */}
         <Route path="/dashboard" element={
-          <ProtectedRoute><DashboardPage /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <DashboardPage />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/explore" element={
-          <ProtectedRoute><ExplorePage /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ExplorePage />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/materials/:slug" element={
-          <ProtectedRoute><MaterialPage /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <MaterialPage />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
 
         {/* Create flow — 3 steps */}
         <Route path="/editor" element={
-          <ProtectedRoute><MetadataStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <MetadataStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/editor/content" element={
-          <ProtectedRoute><ContentStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ContentStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/editor/review" element={
-          <ProtectedRoute><ReviewStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ReviewStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
 
         {/* Edit flow — same 3 steps, pre-filled */}
         <Route path="/editor/:id" element={
-          <ProtectedRoute><MetadataStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <MetadataStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/editor/:id/content" element={
-          <ProtectedRoute><ContentStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ContentStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
         <Route path="/editor/:id/review" element={
-          <ProtectedRoute><ReviewStep /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ReviewStep />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
 
         {/* Own profile */}
         <Route path="/profile" element={
-          <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ProfilePage />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
 
         {/* Public profile */}
         <Route path="/profile/:username" element={
-          <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ProfilePage />
+            </ErrorBoundary>
+          </ProtectedRoute>
         } />
       </Routes>
     </BrowserRouter>

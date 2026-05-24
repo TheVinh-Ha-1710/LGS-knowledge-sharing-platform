@@ -6,63 +6,26 @@ function StepIndicator({ currentStep }) {
   ]
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 40 }}>
+    <div className="step-indicator">
       {steps.map((step, index) => (
-        <div key={step.number} style={{ display: 'flex', alignItems: 'center' }}>
-
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 12,
-              fontWeight: 700,
-              border: '2px solid',
-              transition: 'all 0.2s',
-              ...(step.number < currentStep && {
-                background: 'var(--accent)',
-                borderColor: 'var(--accent)',
-                color: 'var(--bg)'
-              }),
-              ...(step.number === currentStep && {
-                background: 'transparent',
-                borderColor: 'var(--accent)',
-                color: 'var(--accent)'
-              }),
-              ...(step.number > currentStep && {
-                background: 'transparent',
-                borderColor: 'var(--border-2)',
-                color: 'var(--text-3)'
-              }),
-            }}>
+        <div key={step.number} style={{ display: 'flex', alignItems: 'flex-start' }}>
+          <div className="step-item">
+            <div className={`step-circle ${
+              step.number < currentStep ? 'done' :
+              step.number === currentStep ? 'current' : 'upcoming'
+            }`}>
               {step.number < currentStep ? '✓' : step.number}
             </div>
-
-            <span style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: 10,
-              letterSpacing: '0.08em',
-              color: step.number === currentStep ? 'var(--accent)' : 'var(--text-3)',
-              transition: 'color 0.2s'
-            }}>
+            <div className={`step-label ${
+              step.number < currentStep ? 'done' :
+              step.number === currentStep ? 'current' : ''
+            }`}>
               {step.label}
-            </span>
+            </div>
           </div>
-
           {index < steps.length - 1 && (
-            <div style={{
-              width: 80,
-              height: 2,
-              marginBottom: 22,
-              background: step.number < currentStep ? 'var(--accent)' : 'var(--border-2)',
-              transition: 'background 0.2s'
-            }} />
+            <div className={`step-connector ${step.number < currentStep ? 'done' : 'upcoming'}`} />
           )}
-
         </div>
       ))}
     </div>

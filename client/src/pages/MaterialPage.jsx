@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useEffect } from 'react'
 import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
-import { DifficultyBadge, getFieldAccent } from '../utils.jsx'
+import { DifficultyBadge } from '../utils.jsx'
 import DOMPurify from 'dompurify'
-import { useEffect } from 'react'
 import Reactions from '../components/Reactions'
 import ReadStatus from '../components/ReadStatus'
 import Notes from '../components/Notes'
@@ -15,6 +15,7 @@ function MaterialPage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
+  // Track view once on mount
   useEffect(() => {
     api.trackView(slug).then(() => {
       queryClient.invalidateQueries({ queryKey: ['material', slug] })
@@ -24,7 +25,7 @@ function MaterialPage() {
   const { data: material, isLoading, error } = useQuery({
     queryKey: ['material', slug],
     queryFn: () => api.getMaterial(slug),
-    refetchOnWindowFocus: false     // Not fetch on tab switch
+    refetchOnWindowFocus: false
   })
 
   const deleteMutation = useMutation({
@@ -54,53 +55,51 @@ function MaterialPage() {
   )
 
   const isAuthor = user && material?.author_id === user.id
-  const fieldAccent = getFieldAccent(material?.field_slug)
 
   return (
-    <div className="app-page" style={{ maxWidth: 740 }}>
+    <div className="app-page-wide">
 
       {/* Back */}
-      <button
-        onClick={() => navigate('/explore')}
-        style={{ background: 'none', border: 'none', color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 11, cursor: 'pointer', padding: 0, marginBottom: 28, letterSpacing: '0.08em' }}
-      >
+      <button className="back-btn" onClick={() => navigate('/explore')}>
         ← back to explore
       </button>
 
-      {/* Field + difficulty */}
-      <div style={{ display: 'flex', align: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 11,
-          color: fieldAccent,
-          letterSpacing: '0.08em',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 5
-        }}>
+      {/* Field + difficulty + views */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)' }}>
           {material?.field_icon} {material?.field_name}
         </span>
         <DifficultyBadge difficulty={material?.difficulty} />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-4)' }}>
           // {material?.view_count} views
         </span>
       </div>
 
       {/* Title */}
-      <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 10, lineHeight: 1.2 }}>
+      <h1 style={{
+        fontSize: 26,
+        fontWeight: 500,
+        letterSpacing: '-0.02em',
+        marginBottom: 10,
+        lineHeight: 1.25,
+        color: 'var(--text)'
+      }}>
         {material?.title}
       </h1>
 
       {/* Author + date */}
-      <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 16 }}>
-        by <Link
+      <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-4)', marginBottom: 14 }}>
+        by{' '}
+        <Link
           to={`/profile/${material?.author_email?.split('@')[0]}`}
-          style={{ color: 'var(--text-2)', textDecoration: 'none', fontFamily: 'var(--font-mono)' }}
+          style={{ color: 'var(--text-3)', textDecoration: 'none' }}
         >
           {material?.author_email?.split('@')[0]}
         </Link>
         {' · '}
-        {new Date(material?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+        {new Date(material?.created_at).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        })}
       </p>
 
       {/* Tags */}
@@ -113,10 +112,10 @@ function MaterialPage() {
                 fontFamily: 'var(--font-mono)',
                 fontSize: 10,
                 padding: '2px 8px',
-                background: 'var(--accent-dim)',
-                color: 'var(--accent)',
-                borderRadius: 3,
-                letterSpacing: '0.05em'
+                background: 'var(--bg-2)',
+                color: 'var(--text-3)',
+                borderRadius: 'var(--radius-full)',
+                border: '0.5px solid var(--border)'
               }}
             >
               #{tag.name}
@@ -125,8 +124,7 @@ function MaterialPage() {
         </div>
       )}
 
-      {/* Divider */}
-      <div style={{ height: 1, background: 'var(--border)', marginBottom: 28 }} />
+      <div className="divider" />
 
       {/* Content */}
       <div
@@ -136,45 +134,41 @@ function MaterialPage() {
         }}
       />
 
-      {/* Divider */}
-      <div style={{ height: 1, background: 'var(--border)', margin: '40px 0 24px' }} />
+      <div className="divider" />
 
       {/* Reactions */}
       <Reactions materialId={material?.id} />
 
-      {/* Read status — only show if not the author */}
+      {/* Read status — only for non-authors */}
       {!isAuthor && (
         <div style={{ marginTop: 16 }}>
           <ReadStatus materialId={material?.id} />
         </div>
       )}
 
-      {/* Private notes — only visible to logged in user */}
+      {/* Notes */}
       <Notes materialId={material?.id} />
 
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {isAuthor && (
-          <>
-            <button
-              onClick={() => navigate(`/editor/${material.id}`)}
-              className="btn btn-ghost"
-              style={{ width: 'auto', padding: '10px 24px' }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-              className="btn btn-danger"
-              style={{ width: 'auto', padding: '10px 24px' }}
-            >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-            </button>
-          </>
-        )}
-      </div>
+      <div className="divider" />
 
+      {/* Author actions */}
+      {isAuthor && (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => navigate(`/editor/${material.id}`)}
+            className="btn btn-ghost btn-sm"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+            className="btn btn-danger btn-sm"
+          >
+            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
