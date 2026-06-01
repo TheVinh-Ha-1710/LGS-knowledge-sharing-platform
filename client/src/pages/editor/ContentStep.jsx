@@ -7,6 +7,7 @@ import { createLowlight, common } from 'lowlight'
 import StepIndicator from '../../components/StepIndicator'
 import EditorToolbar from '../../components/EditorToolbar'
 import Image from '@tiptap/extension-image'
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table'
 
 const lowlight = createLowlight(common)
 
@@ -37,7 +38,11 @@ function ContentStep() {
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       CodeBlockLowlight.configure({ lowlight }),
-      Image.configure({ inline: false })
+      Image.configure({ inline: false }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableCell,
+      TableHeader,
     ],
     content: content || '',
     onUpdate: ({ editor }) => {

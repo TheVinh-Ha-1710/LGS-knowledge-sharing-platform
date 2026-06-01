@@ -70,8 +70,19 @@ function EditorToolbar({ editor }) {
         { label: '❝',                  title: 'Blockquote',      action: () => editor.chain().focus().toggleBlockquote().run(),   active: editor.isActive('blockquote') },
         { label: '—',                  title: 'Horizontal rule', action: () => editor.chain().focus().setHorizontalRule().run(),  active: false },
         { label: uploading ? '...' : '🖼', title: 'Upload image', action: () => fileInputRef.current?.click(), active: false },
+        { label: '⊞',                 title: 'Insert table',    action: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(), active: editor.isActive('table') },
       ]
     }
+  ]
+
+  const tableActions = [
+    { label: '+←', title: 'Add col before',  action: () => editor.chain().focus().addColumnBefore().run() },
+    { label: '+→', title: 'Add col after',   action: () => editor.chain().focus().addColumnAfter().run() },
+    { label: '−col', title: 'Delete col',    action: () => editor.chain().focus().deleteColumn().run() },
+    { label: '+↑', title: 'Add row before',  action: () => editor.chain().focus().addRowBefore().run() },
+    { label: '+↓', title: 'Add row after',   action: () => editor.chain().focus().addRowAfter().run() },
+    { label: '−row', title: 'Delete row',    action: () => editor.chain().focus().deleteRow().run() },
+    { label: '✕',   title: 'Delete table',   action: () => editor.chain().focus().deleteTable().run() },
   ]
 
   return (
@@ -119,6 +130,44 @@ function EditorToolbar({ editor }) {
               <option key={lang.value} value={lang.value}>{lang.label}</option>
             ))}
           </select>
+        </div>
+      )}
+
+      {/* Table action row — only visible when cursor is inside a table */}
+      {editor.isActive('table') && (
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          paddingTop: 6,
+          marginTop: 4,
+          borderTop: '0.5px solid var(--border)',
+        }}>
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: 'var(--text-4)',
+            marginRight: 4,
+            letterSpacing: '0.05em',
+          }}>
+            table
+          </span>
+          {tableActions.map((action, i) => (
+            <>
+              {i === 3 && <div key={`div-${i}`} className="editor-toolbar-divider" />}
+              {i === 6 && <div key={`div-del-${i}`} className="editor-toolbar-divider" />}
+              <button
+                key={action.title}
+                title={action.title}
+                className="editor-toolbar-btn"
+                onClick={action.action}
+                type="button"
+              >
+                {action.label}
+              </button>
+            </>
+          ))}
         </div>
       )}
 
