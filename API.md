@@ -560,3 +560,28 @@ Delete a note permanently.
 ```json
 { "message": "Note deleted" }
 ```
+
+---
+
+## Upload
+
+### POST /upload
+
+Upload an image to Cloudinary for use in material content.
+
+**Auth required:** Yes
+
+**Request:** `multipart/form-data` with a single field named `image`. Maximum file size: 5MB. Only image MIME types are accepted.
+
+Images are stored in the `lgs-materials` Cloudinary folder and are automatically optimised — resized to a maximum width of 1200px, quality auto-compressed, and served as WebP where the browser supports it.
+
+**Success response `200`:**
+```json
+{ "url": "https://res.cloudinary.com/..." }
+```
+
+**Error responses:**
+- `400` — No file provided
+- `400` — Only image files are allowed
+- `401` — Not logged in
+- `500` — Cloudinary upload error

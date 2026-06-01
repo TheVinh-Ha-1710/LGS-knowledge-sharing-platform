@@ -178,6 +178,7 @@ All schema changes go through migration files in `migrations/`. The `node-pg-mig
 | GET | /api/notes/:materialId | routes/notes.js | Yes | Get own note |
 | POST | /api/notes/:materialId | routes/notes.js | Yes | Create or update note |
 | DELETE | /api/notes/:materialId | routes/notes.js | Yes | Delete note |
+| POST | /api/upload | routes/upload.js | Yes | Upload image to Cloudinary |
 
 ---
 
@@ -187,9 +188,15 @@ The React frontend uses a context + React Query pattern:
 
 ```
 AuthContext          ← global auth state (user, login, logout, checkAuth)
+EditorContext        ← shared editor state across the 3-step create/edit flow
+ToastContext         ← global toast notifications (success, error, info)
 React Query          ← server state (materials, fields) with caching
 Component state      ← local UI state (form inputs, selected filters)
 ```
+
+`useTheme` is a custom hook that manages dark/light mode. It reads from `localStorage` on mount (falling back to the OS preference via `prefers-color-scheme`), applies the theme class to `<html>`, and persists the choice.
+
+`ErrorBoundary` is a class component that wraps the entire app tree. It catches unhandled render errors and displays a "Something went wrong" fallback with a reload button.
 
 **Why React Query instead of plain fetch + useState?**
 React Query handles loading states, error states, caching, and background refetching automatically. Without it, every component that fetches data needs its own `isLoading`, `error`, and `data` state plus a `useEffect` to trigger the fetch. React Query reduces this to a single `useQuery` call and provides cache invalidation so pages update automatically after mutations.

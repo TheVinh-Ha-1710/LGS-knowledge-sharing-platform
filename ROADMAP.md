@@ -37,30 +37,27 @@ Core knowledge sharing platform with authentication and rich text editing.
 - ✅ Trending materials on dashboard
 - ✅ Personal notes on materials — private per-user with profile preview
 
+### v1.1.1 — UI Polish & Refinement ✅
+
+- ✅ Full visual redesign — new CSS variable system, typography, and spacing
+- ✅ Dark/light mode toggle with system preference detection
+- ✅ Toast notification system (success, error, info) with auto-dismiss
+- ✅ ErrorBoundary — catches render errors with a reload prompt
+- ✅ Mobile responsiveness improvements
+
+### v1.1.2 — Content Editor Improvements ✅
+
+- ✅ Image upload in the editor via Cloudinary
+- ✅ Code block language selection in the editor toolbar
+- ✅ Word count display in the editor
+
+### v1.1.3 — Tables in Editor ✅
+
+- ✅ Table support in the rich text editor
+
 ---
 
 ## Upcoming
-
-### v1.1.1 — UI Polish & Refinement
-
-- [ ] Consistent spacing, typography and component styles
-- [ ] Mobile responsiveness improvements
-- [ ] Loading states and empty states polish
-- [ ] Error handling and user feedback improvements
-
-### v1.1.2 — Content Editor Improvements
-
-- [ ] Improved toolbar with more formatting options
-- [ ] Image upload support
-- [ ] Better code block language selection
-- [ ] Word count and reading time estimate
-
-### v1.1.3 — Inline Highlights & Annotations
-
-- [ ] Text selection → highlight with color
-- [ ] Inline annotation attached to highlight
-- [ ] Highlight persistence across edits
-- [ ] Full annotations list on profile
 
 ### v1.2.0 — Discovery
 
@@ -104,7 +101,6 @@ Not prioritised yet — things worth considering.
 - Difficulty voting — community can suggest a different difficulty rating
 - "Prerequisites" links between materials
 - Verified by field — cross-discipline endorsement system
-- Dark/light mode toggle
 - Export material as PDF
 - Embed code snippets with live preview (for IT materials)
 - Public/private toggle per material

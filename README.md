@@ -5,7 +5,7 @@ A private knowledge sharing platform for a group of friends from different acade
 ---
 
 ## Current version
-v1.1.0 — [Release notes](https://github.com/TheVinh-Ha-1710/LGS-knowledge-sharing-platform/releases/tag/v1.1.0)
+v1.1.3 — [Release notes](https://github.com/TheVinh-Ha-1710/LGS-knowledge-sharing-platform/releases/tag/v1.1.3)
 
 ---
 
@@ -38,6 +38,7 @@ DATABASE_URL=postgresql://username:password@localhost:5432/your_database_name
 JWT_SECRET=a-long-random-secret-string
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
 NODE_ENV=development
 ```
 
@@ -140,7 +141,8 @@ lets-get-smarter/
 │   ├── reads.js           # Read tracking endpoints
 │   ├── stats.js           # Leaderboard and trending endpoints
 │   ├── users.js           # User profile endpoints
-│   └── notes.js           # Personal notes endpoints
+│   ├── notes.js           # Personal notes endpoints
+│   └── upload.js          # Image upload via Cloudinary
 ├── migrations/            # Database migration files
 ├── seed.js                # Fields seed script
 ├── .env                   # Environment variables (not committed)
@@ -150,10 +152,14 @@ lets-get-smarter/
         ├── utils.jsx      # Shared components and helpers
         ├── context/
         │   ├── AuthContext.jsx
-        │   └── EditorContext.jsx
+        │   ├── EditorContext.jsx
+        │   └── ToastContext.jsx
+        ├── hooks/
+        │   └── useTheme.js
         ├── components/
         │   ├── Navbar.jsx
         │   ├── ProtectedRoute.jsx
+        │   ├── ErrorBoundary.jsx
         │   ├── EditorToolbar.jsx
         │   ├── StepIndicator.jsx
         │   ├── Reactions.jsx

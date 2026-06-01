@@ -7,6 +7,35 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.3] — 2026-06-01
+
+### Added
+- Table support in the rich text editor
+
+---
+
+## [1.1.2] — 2026-05-28
+
+### Added
+- Image upload in the editor via Cloudinary — 5MB limit, auto-optimised to WebP, max 1200px width
+- Code block language selection in the editor toolbar
+- Word count display in the editor
+
+---
+
+## [1.1.1] — 2026-05-25
+
+### Added
+- Dark/light mode toggle with system preference detection and localStorage persistence
+- Toast notification system (success, error, info) with auto-dismiss
+- ErrorBoundary component — catches render errors and shows a reload prompt
+
+### Changed
+- Full visual redesign — new CSS variable system, updated typography, spacing, and component styles
+- Mobile responsiveness improvements across all pages
+
+---
+
 ## [1.1.0] — 2026-05-22
 
 ### Added
@@ -95,16 +124,3 @@ First stable release. MVP delivered and ready for use by the core group.
 - CORS configured for cross-origin React frontend
 - Vite proxy for clean API calls in development
 
----
-
-## [1.0.1] — 2026-05-08
-
-### Fixed
-- View count now increments once per visit, not on every tab switch
-- Knowledge base restricted to authenticated users only
-- Google OAuth button now uses relative URL — works in production
-
-### Changed
-- Material creation and editing now uses a 3-step flow:
-  Metadata → Content → Review before publishing
-- Draft auto-saves to localStorage so work is never lost mid-flow
