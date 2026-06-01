@@ -23,8 +23,9 @@ Full-stack monorepo — Express backend + React frontend.
   - api.js — all fetch functions
 
 ## Database
-PostgreSQL. Tables: users, user_profiles, fields, materials, tags, 
-material_tags, reads, reactions, notes, blocklist, login_attempts, streaks
+PostgreSQL. Tables: users, user_profiles, fields, materials, tags,
+material_tags, reads, reactions, notes, blocklist, login_attempts
+Note: streaks are computed dynamically from reads.completed — there is no streaks table
 
 ## Key conventions
 - All API routes prefixed /api
